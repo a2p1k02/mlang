@@ -3,6 +3,7 @@
 #include <boost/phoenix/operator.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <complex>
 
@@ -32,6 +33,19 @@ bool parse_complex(Iterator first, Iterator last, std::complex<double>& c)
     return r;
 }
 
+std::vector<std::string> split_string(const std::string &str)
+{
+    std::vector<std::string> parts;
+    std::istringstream iss(str);
+    std::string part;
+
+    while (iss >> part) {
+        parts.push_back(part);
+    }
+
+    return parts;
+}
+
 int main()
 {
     std::cout << "Give me a complex number of the form like r or (r) or (r, i)\n";
@@ -45,11 +59,13 @@ int main()
         if (input.empty() || tolower(input[0]) == 'e')
             break;
 
-        std::complex<double> d;
-        if (parse_complex(input.begin(), input.end(), d)) {
-            std::cout << "got: " << d << std::endl;
-        } else {
-            std::cout << "parsing failed\n";
+        std::vector<std::string> parts = split_string(input);
+
+        for (auto p : parts) {
+            std::complex<double> d;
+            if (parse_complex(input.begin(), input.end(), d)) {
+                
+            }
         }
     }
 

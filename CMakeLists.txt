@@ -1,8 +1,6 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.28)
 
-project(boost_template_app) # <-- change this for your name
-
-set(BOOST_ROOT external/boost)
+project(mlang) # <-- change this for your name
 
 # Uncomment component that you want to use
 set(BOOST_COMPONENTS
