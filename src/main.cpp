@@ -54,7 +54,7 @@ int main()
     std::cout << "Type [q or Q] to quit\n\n";
 
     std::string input;
-    while (true) {
+    for (;;) {
         std::cout << ">>> ";
         getline(std::cin, input);
 
