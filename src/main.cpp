@@ -1,13 +1,13 @@
-#include <boost/spirit/home/qi/detail/parse_auto.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix/core.hpp>
 #include <boost/phoenix/operator.hpp>
+#include <boost/phoenix/stl.hpp>
 
 #include <iostream>
+#include <vector>
 #include <string>
 
-template <typename Iterator>
-bool add(Iterator first, Iterator last, double& n)
+namespace mlang 
 {
     namespace qi = boost::spirit::qi;
     namespace ascii = boost::spirit::ascii;
@@ -15,34 +15,58 @@ bool add(Iterator first, Iterator last, double& n)
 
     using qi::double_;
     using qi::_1;
-    using phoenix::ref;
+    using phoenix::push_back;
 
-    bool r = qi::phrase_parse(first, last, 
+    template <typename Iterator>
+    bool parse_numbers(Iterator first, Iterator last, std::vector<double>& nums)
+    {
+        bool r = qi::phrase_parse(first, last, 
             (
-                double_[ref(n) = _1] >> *(' ' >> double_[ref(n) += _1])
+                double_[push_back(phoenix::ref(nums), _1)] 
+                    >> *(double_[push_back(phoenix::ref(nums), _1)])
             ),
-            ";");
+            ascii::space);
     
-    if (first != last) return false;
-    return r;
+        if (first != last) return false;
+        return r;
+    }   
+
+    double count(std::vector<double> nums, char op)
+    {
+        double res = nums[0];
+        for (int i = 1; i < nums.size(); i++) {
+            if (op == '+') {
+                res += nums[i];
+            } else if (op == '-') {
+                res -= nums[i];
+            } else if (op == '*') {
+                res *= nums[i];
+            } else if (op == '/') {
+                res /= nums[i];
+            }
+        }
+        return res;
+    }
 }
 
 int main()
 {
-    std::cout << "Give me a complex number of the form like r or (r) or (r, i)\n";
-    std::cout << "Type [e or E] to exit\n\n";
+    std::cout << "Type [q or Q] to quit\n\n";
 
     std::string input;
     while (true) {
         std::cout << ">>> ";
-        std::cin >> input;
+        getline(std::cin, input);
 
-        if (input.empty() || tolower(input[0]) == 'e')
+        if (input.empty() || tolower(input[0]) == 'q')
             break;
 
-        double n;
-        if (add(input.begin(), input.end(), n)) {
-            std::cout << "sum: " << n << std::endl; 
+        std::vector<double> nums;
+        char op = input[0];
+        input = input.erase(0, 1);
+
+        if (mlang::parse_numbers(input.begin(), input.end(), nums)) {
+            std::cout << mlang::count(nums, op) << std::endl; 
         } else {
             std::cout << "parsing error\n";
         }
@@ -50,3 +74,4 @@ int main()
 
     return 0;
 }
+
