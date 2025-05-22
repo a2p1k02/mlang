@@ -1,6 +1,21 @@
-# boost template app
+# mlang
 
-### LINUX ONLY. WINDOWS IS WORK IN PROGRESS
+This is a lisp-like language written on C++ and Boost library.
 
-This is a template for any boost applications with CMake.
-Use the CMakeLists.txt file to add or remove components that you don't want to use
+## How to build 
+```bash
+sudo pacman -Syu clang boost boost-libs
+mkdir build && cd build
+cmake ..
+make
+./mlang
+```
+
+## Example
+```lispy
+Type [q or Q] to quit
+
+
+>>> + 2 4 6
+12
+```
