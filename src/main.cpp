@@ -1,49 +1,30 @@
+#include <boost/spirit/home/qi/detail/parse_auto.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix/core.hpp>
 #include <boost/phoenix/operator.hpp>
 
 #include <iostream>
-#include <sstream>
 #include <string>
-#include <complex>
 
 template <typename Iterator>
-bool parse_complex(Iterator first, Iterator last, std::complex<double>& c)
+bool add(Iterator first, Iterator last, double& n)
 {
-    using boost::spirit::qi::double_;
-    using boost::spirit::qi::_1;
-    using boost::spirit::qi::phrase_parse;
-    using boost::spirit::ascii::space;
-    using boost::phoenix::ref;
+    namespace qi = boost::spirit::qi;
+    namespace ascii = boost::spirit::ascii;
+    namespace phoenix = boost::phoenix;
 
-    double rN = 0.0;
-    double iN = 0.0;
+    using qi::double_;
+    using qi::_1;
+    using phoenix::ref;
 
-    bool r = phrase_parse(first, last, 
+    bool r = qi::phrase_parse(first, last, 
             (
-                '(' >> double_[ref(rN) = _1]
-                    >> -(',' >> double_[ref(iN) = _1]) >> ')'
-                | double_[ref(rN) = _1]
+                double_[ref(n) = _1] >> *(' ' >> double_[ref(n) += _1])
             ),
-            space);
+            ";");
     
-    if (!r || first != last) return false;
-
-    c = std::complex<double>(rN, iN);
+    if (first != last) return false;
     return r;
-}
-
-std::vector<std::string> split_string(const std::string &str)
-{
-    std::vector<std::string> parts;
-    std::istringstream iss(str);
-    std::string part;
-
-    while (iss >> part) {
-        parts.push_back(part);
-    }
-
-    return parts;
 }
 
 int main()
@@ -59,13 +40,11 @@ int main()
         if (input.empty() || tolower(input[0]) == 'e')
             break;
 
-        std::vector<std::string> parts = split_string(input);
-
-        for (auto p : parts) {
-            std::complex<double> d;
-            if (parse_complex(input.begin(), input.end(), d)) {
-                
-            }
+        double n;
+        if (add(input.begin(), input.end(), n)) {
+            std::cout << "sum: " << n << std::endl; 
+        } else {
+            std::cout << "parsing error\n";
         }
     }
 
